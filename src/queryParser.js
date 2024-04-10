@@ -18,16 +18,15 @@ function parseQuery(query) {
 }
 
 function parseWhereClause(whereString) {
-    const conditions = whereString.split(/ AND | OR /i);
-    if(conditions){
-        return conditions.map(condition => {
-            const [field, operator, value] = condition.split(/\s+/);
-            return { field, operator, value };
-        });
-    } else {
-        throw new Error('Invalid query format');
-    }
-    
+    const conditionRegex = /(.*?)(=|!=|>|<|>=|<=)(.*)/;
+    return whereString.split(/ AND | OR /i).map(conditionString => {
+        const match = conditionString.match(conditionRegex);
+        if (match) {
+            const [, field, operator, value] = match;
+            return { field: field.trim(), operator, value: value.trim() };
+        }
+        throw new Error('Invalid WHERE clause format');
+    });
 }
 
 module.exports = parseQuery;
